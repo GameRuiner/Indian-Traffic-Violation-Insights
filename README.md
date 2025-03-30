@@ -56,3 +56,26 @@ AWS_ACCESS_KEY=your_access_key
 AWS_SECRET_KEY=your_secret_key
 BUCKET_NAME=your_bucket_name
 ```
+
+## Moving Data from the Lake to a Data Warehouse
+
+Once data is stored in the data lake (S3), the next step is to load it into a Data Warehouse (PostgreSQL) for further analysis and querying.
+
+### Data Flow
+
+1. Extract: Download data from S3.
+2. Load: Insert data into a PostgreSQL table.
+3. Schedule: Automate the process using Apache Airflow.
+
+### Running the Data Warehouse Pipeline
+
+1. Trigger the DAG manually (optional):
+
+```sh
+docker exec -it airflow-webserver airflow dags trigger s3_to_postgres_pipeline
+```
+
+2. Verify the Data in PostgreSQL:
+```sh
+docker exec -it db psql -U postgres -d db -c "SELECT COUNT(*) FROM traffic_violations;"
+```

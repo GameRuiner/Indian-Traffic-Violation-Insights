@@ -14,9 +14,9 @@ load_dotenv()
 AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
+S3_FILE_PATH = os.environ.get("S3_FILE_PATH")
 
 LOCAL_FILE_PATH = "/opt/airflow/dags/files/Indian_Traffic_Violations.csv"
-S3_FILE_PATH = "raw/traffic_violations.csv"
 
 def extract_data():
     df = pd.read_csv(LOCAL_FILE_PATH)
