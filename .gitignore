@@ -175,3 +175,8 @@ cython_debug/
 
 # airflow
 opt/airflow/logs
+
+# terraform
+terraform.tfvars
+.terraform
+*.pkg

@@ -10,6 +10,39 @@ However, raw traffic violation data is often complex, scattered, and difficult t
 
 This project processes and visualizes Indian traffic violation data, providing actionable insights through a structured BI dashboard.
 
+## Infrastructure as Code (IaC)
+
+This project uses Terraform to provision and manage AWS resources, including an RDS PostgreSQL database, an S3 data lake, and a security group for database access.
+
+## Terraform setup & deployment
+
+### 1️⃣ Define variables
+
+Sensitive credentials (e.g., database username and password) are stored in terraform.tfvars, which is gitignored for security.
+
+These variables are declared in variables.tf.
+
+### 2️⃣ AWS credentials setup
+
+Terraform uses AWS credentials configured via:
+
+```sh
+aws configure
+```
+
+### 3️⃣ Plan & apply
+
+To preview changes before applying:
+
+```sh
+terraform plan -var-file="terraform.tfvars"
+```
+
+To apply the infrastructure:
+```sh
+terraform apply -var-file="terraform.tfvars"
+```
+
 ## Batch data pipeline to data lake
 
 Data pipeline using Apache Airflow to extract, transform, and load (ETL) traffic violation data into an AWS S3-based data lake. The pipeline is orchestrated with Airflow, running in a Dockerized environment.
@@ -101,10 +134,12 @@ To visualize and analyze data effectively, I researched various Business Intelli
 
 ## 🔧 Tech stack summary
 
-- **Data Lake**: AWS S3
+- **IaC tool**: Terraform
 
-- **Data Warehouse**: PostgreSQL
+- **Data lake**: AWS S3
 
-- **ETL Pipeline**: Apache Airflow 
+- **Data warehouse**: PostgreSQL
+
+- **ETL pipeline**: Apache Airflow 
 
 - **Dashboard**: QuickSight
