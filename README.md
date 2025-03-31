@@ -79,3 +79,12 @@ docker exec -it airflow-webserver airflow dags trigger s3_to_postgres_pipeline
 ```sh
 docker exec -it db psql -U postgres -d db -c "SELECT COUNT(*) FROM traffic_violations;"
 ```
+
+## Dashboard
+
+To visualize and analyze data effectively, I researched various Business Intelligence (BI) tools and their compatibility with PostgreSQL. Below are my findings:
+
+1. Power BI – works only on Windows, limiting cross-platform accessibility.
+2. Tableau – the free public version does not support PostgreSQL as a data source.
+3. Looker – unable to connect to PostgreSQL, despite my Airflow DAG successfully doing so.
+4. Amazon QuickSight – the best option for my use case. It is cloud-based, supports multiple data sources (including PostgreSQL) even in the free version. However, a limitation is that dashboards cannot be made public, so insights are exported as a PDF file named insights.pdf.
