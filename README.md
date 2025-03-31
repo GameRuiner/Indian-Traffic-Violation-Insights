@@ -1,6 +1,6 @@
-# Indian Traffic Violation Insights
+# Indian traffic violation insights
 
-## Problem Description
+## Problem description
 
 Traffic violations are a significant issue in India, contributing to road congestion, accidents, and safety risks. With a vast number of violations recorded daily, analyzing this data is crucial for identifying patterns, improving law enforcement strategies, and enhancing road safety measures.
 
@@ -14,7 +14,7 @@ This project processes and visualizes Indian traffic violation data, providing a
 
 Data pipeline using Apache Airflow to extract, transform, and load (ETL) traffic violation data into an AWS S3-based data lake. The pipeline is orchestrated with Airflow, running in a Dockerized environment.
 
-### Data Flow
+### Data flow
 
 1.	Input: A CSV file (Indian_Traffic_Violations.csv) stored in Airflow’s DAG directory.
 2.	Processing: Airflow DAG executes three tasks:
@@ -27,7 +27,7 @@ Data pipeline using Apache Airflow to extract, transform, and load (ETL) traffic
 
 The DAG (traffic_violation_pipeline) automates the ETL process on a daily schedule.
 
-### Docker Setup
+### Docker setup
 
 The pipeline runs in a Dockerized environment using docker-compose. Key services:
 -	PostgreSQL (Metadata database)
@@ -35,7 +35,7 @@ The pipeline runs in a Dockerized environment using docker-compose. Key services
 -	Airflow Scheduler & Webserver
 -	Airflow Worker (Executes DAG tasks)
 
-### Running the Pipeline
+### Running the pipeline
 
 1.	Start Services:
 ```sh
@@ -57,7 +57,7 @@ Password: airflow
 docker exec -it airflow-webserver airflow dags trigger traffic_violation_pipeline
 ```
 
-### Environment Variables
+### Environment variables
 
 Set these variables in a .env file:
 
@@ -67,17 +67,17 @@ AWS_SECRET_KEY=your_secret_key
 BUCKET_NAME=your_bucket_name
 ```
 
-## Moving Data from the Lake to a Data Warehouse
+## Moving data from the lake to a data warehouse
 
 Once data is stored in the data lake (S3), the next step is to load it into a Data Warehouse (PostgreSQL) for further analysis and querying.
 
-### Data Flow
+### Data flow
 
 1. Extract: Download data from S3.
 2. Load: Insert data into a PostgreSQL table.
 3. Schedule: Automate the process using Apache Airflow.
 
-### Running the Data Warehouse Pipeline
+### Running the data warehouse pipeline
 
 1. Trigger the DAG manually (optional):
 
@@ -85,7 +85,7 @@ Once data is stored in the data lake (S3), the next step is to load it into a Da
 docker exec -it airflow-webserver airflow dags trigger s3_to_postgres_pipeline
 ```
 
-2. Verify the Data in PostgreSQL:
+2. Verify the data in PostgreSQL:
 ```sh
 docker exec -it db psql -U postgres -d db -c "SELECT COUNT(*) FROM traffic_violations;"
 ```
@@ -98,3 +98,13 @@ To visualize and analyze data effectively, I researched various Business Intelli
 2. Tableau – the free public version does not support PostgreSQL as a data source.
 3. Looker – unable to connect to PostgreSQL, despite my Airflow DAG successfully doing so.
 4. Amazon QuickSight – the best option for my use case. It is cloud-based, supports multiple data sources (including PostgreSQL) even in the free version. However, a limitation is that dashboards cannot be made public, so insights are exported as a PDF file named insights.pdf.
+
+## 🔧 Tech stack summary
+
+- **Data Lake**: AWS S3
+
+- **Data Warehouse**: PostgreSQL
+
+- **ETL Pipeline**: Apache Airflow 
+
+- **Dashboard**: QuickSight
