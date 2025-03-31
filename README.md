@@ -1,5 +1,15 @@
 # Indian Traffic Violation Insights
 
+## Problem Description
+
+Traffic violations are a significant issue in India, contributing to road congestion, accidents, and safety risks. With a vast number of violations recorded daily, analyzing this data is crucial for identifying patterns, improving law enforcement strategies, and enhancing road safety measures.
+
+However, raw traffic violation data is often complex, scattered, and difficult to interpret. Decision-makers, policymakers, and analysts need clear insights to understand:
+-   Common types of violations (e.g., speeding, signal jumping, illegal parking)
+-   Violation trends over time (e.g., seasonal or regional patterns)
+
+This project processes and visualizes Indian traffic violation data, providing actionable insights through a structured BI dashboard.
+
 ## Batch data pipeline to data lake
 
 Data pipeline using Apache Airflow to extract, transform, and load (ETL) traffic violation data into an AWS S3-based data lake. The pipeline is orchestrated with Airflow, running in a Dockerized environment.
