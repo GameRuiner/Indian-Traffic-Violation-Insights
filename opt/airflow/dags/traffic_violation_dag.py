@@ -1,31 +1,35 @@
 import logging
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from airflow.utils.log.logging_mixin import LoggingMixin
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import pandas as pd
-import boto3
 import os
 import traceback
+import kagglehub
+import boto3
+from airflow import DAG
+from airflow.operators.python import PythonOperator
 
 load_dotenv()
 
 AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
-S3_FILE_PATH = os.environ.get("S3_FILE_PATH")
-
-LOCAL_FILE_PATH = "/opt/airflow/dags/files/Indian_Traffic_Violations.csv"
 
 def extract_data():
-    df = pd.read_csv(LOCAL_FILE_PATH)
-    df.to_csv("/opt/airflow/dags/temp/extracted.csv", index=False)
+    path = kagglehub.dataset_download("khushikyad001/indian-traffic-violation")
+    df = pd.read_csv(f"{path}/Indian_Traffic_Violations.csv")
+    df['Date'] = pd.to_datetime(df['Date'])
+    first_day_of_current_month = datetime.now().replace(day=1)
+    last_day_of_prev_month = first_day_of_current_month - timedelta(days=1)
+    prev_month = last_day_of_prev_month.month
+    prev_year = last_day_of_prev_month.year
+    df_prev_month = df[(df['Date'].dt.month == prev_month) & (df['Date'].dt.year == prev_year)]
+    df_prev_month.to_csv("/opt/airflow/dags/temp/extracted.csv", index=False)
 
 def transform_data():
-    df = pd.read_csv("/opt/airflow/dags/temp/extracted.csv")
+    df = pd.read_csv("./opt/airflow/dags/temp/extracted.csv")
     df = df.drop_duplicates().dropna()
-    df.to_csv("/opt/airflow/dags/temp/cleaned.csv", index=False)
+    df.to_csv("./opt/airflow/dags/temp/cleaned.csv", index=False)
 
 def upload_to_s3(**context):
     try:
@@ -44,18 +48,23 @@ def upload_to_s3(**context):
             aws_access_key_id=AWS_ACCESS_KEY, 
             aws_secret_access_key=AWS_SECRET_KEY
         )
+        today = datetime.now()
+        first_day_of_current_month = today.replace(day=1)
+        last_day_of_prev_month = first_day_of_current_month - timedelta(days=1)
+        year = last_day_of_prev_month.year
+        month = last_day_of_prev_month.month
+        s3_file_path = f"indian-traffic-violations/year={year}/month={month}/data.csv"
         logging.info(f"Uploading to bucket: {BUCKET_NAME}")
-        logging.info(f"S3 destination path: {S3_FILE_PATH}")
-        s3.upload_file(abs_file_path, BUCKET_NAME, S3_FILE_PATH)
-        logging.info(f"Successfully uploaded {abs_file_path} to {BUCKET_NAME}/{S3_FILE_PATH}")
+        logging.info(f"S3 destination path: {s3_file_path}")
+        s3.upload_file(abs_file_path, BUCKET_NAME, s3_file_path)
+        logging.info(f"Successfully uploaded {abs_file_path} to {BUCKET_NAME}/{s3_file_path}")
     except Exception as e:
         logging.error(f"Upload error: {e}")
         logging.error(traceback.format_exc())
         raise
 
-
-default_args = {"start_date": datetime(2025, 2, 27), "max_active_runs": 1, "retries": 0,}
-dag = DAG("traffic_violation_pipeline", default_args=default_args, schedule="@daily", catchup=False)
+default_args = {"max_active_runs": 1, "retries": 0,}
+dag = DAG("traffic_violation_pipeline", default_args=default_args, schedule_interval='@monthly', catchup=True)
 
 task_extract = PythonOperator(task_id="extract_data", python_callable=extract_data, dag=dag)
 task_transform = PythonOperator(task_id="transform_data", python_callable=transform_data, dag=dag)

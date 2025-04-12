@@ -1,4 +1,4 @@
-# Indian traffic violation insights
+# 🚦 Indian traffic violation insights
 
 ## Problem description
 
@@ -47,14 +47,18 @@ terraform apply -var-file="terraform.tfvars"
 
 Data pipeline using Apache Airflow to extract, transform, and load (ETL) traffic violation data into an AWS S3-based data lake. The pipeline is orchestrated with Airflow, running in a Dockerized environment.
 
-### Data flow
+### 📈 Data flow
 
-1.	Input: A CSV file (Indian_Traffic_Violations.csv) stored in Airflow’s DAG directory.
+1.	Input: dataset is downloaded from Kaggle using kagglehub.
 2.	Processing: Airflow DAG executes three tasks:
-    - extract_data: Reads the file and saves it as an intermediate CSV.
-    - transform_data: Cleans the data by removing duplicates and NaNs.
-    - upload_to_s3: Uploads the final processed file to AWS S3.
-3.	Output: The cleaned data is stored in the raw/traffic_violations.csv path in an S3 bucket.
+    - extract_data: Reads the raw CSV and saves a filtered copy for the previous month
+    - transform_data: Cleans the data by removing duplicates and missing values.
+    - upload_to_s3: Uploads the processed file to an S3 bucket with a dynamic path based on year/month.
+3.	Output: The cleaned dataset is uploaded to an S3 bucket using a structured path.
+
+### 📅 Scheduling
+
+- The DAG runs monthly (@monthly), always processing data for the previous calendar month.
 
 ### Airflow DAG
 
