@@ -1,6 +1,6 @@
 # 🚦 Indian traffic violation insights
 
-## Problem description
+## 🤔 Problem description
 
 Traffic violations are a significant issue in India, contributing to road congestion, accidents, and safety risks. With a vast number of violations recorded daily, analyzing this data is crucial for identifying patterns, improving law enforcement strategies, and enhancing road safety measures.
 
@@ -10,7 +10,7 @@ However, raw traffic violation data is often complex, scattered, and difficult t
 
 This project processes and visualizes Indian traffic violation data, providing actionable insights through a structured BI dashboard.
 
-## Infrastructure as Code (IaC)
+## 🛠️ Infrastructure as Code (IaC)
 
 This project uses Terraform to provision and manage AWS resources, including an RDS PostgreSQL database, an S3 data lake, and a security group for database access.
 
@@ -106,13 +106,21 @@ BUCKET_NAME=your_bucket_name
 
 ## Moving data from the lake to a data warehouse
 
-Once data is stored in the data lake (S3), the next step is to load it into a Data Warehouse (PostgreSQL) for further analysis and querying.
+Once data is stored in the data lake (S3), the next step is to load it into a Data Warehouse (PostgreSQL) for efficient querying and dashboarding.
 
 ### Data flow
 
-1. Extract: Download data from S3.
-2. Load: Insert data into a PostgreSQL table.
-3. Schedule: Automate the process using Apache Airflow.
+#### 1. Extract
+The pipeline downloads the latest processed file (monthly) from S3 into the Airflow environment.
+#### 2. Load 
+The CSV data is loaded into a traffic_violations table in PostgreSQL using SQLAlchemy. The table is automatically created on the first run.
+#### 3.	Materialized Views
+After loading, two materialized views are created (if not already present) for analytical use:
+- mv_violation_type_summary: summarizes violation counts by Violation_Type.
+- mv_date_summary: summarizes violation counts by Date.
+These views are refreshed on every DAG run to stay up-to-date with new data.
+#### 3. Schedule
+The entire pipeline is orchestrated using Apache Airflow, scheduled to run monthly with @monthly frequency.
 
 ### Running the data warehouse pipeline
 

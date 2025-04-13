@@ -41,10 +41,51 @@ def load_to_postgres():
     engine = pg_hook.get_sqlalchemy_engine()
     df.to_sql(TABLE_NAME, engine, if_exists="append", index=False)
 
-default_args = {"retries": 0}
+def create_materialized_views():
+    pg_hook = PostgresHook(postgres_conn_id="postgres_dw")
+    sql = """
+    CREATE MATERIALIZED VIEW IF NOT EXISTS mv_violation_type_summary AS
+    SELECT "Violation_Type", COUNT(*) AS total
+    FROM traffic_violations
+    GROUP BY "Violation_Type";
+
+    CREATE MATERIALIZED VIEW IF NOT EXISTS mv_date_summary AS
+    SELECT "Date", COUNT(*) AS total
+    FROM traffic_violations
+    GROUP BY "Date";
+    """
+    pg_hook.run(sql)
+
+def refresh_materialized_views():
+    pg_hook = PostgresHook(postgres_conn_id="postgres_dw")
+    pg_hook.run("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_violation_type_summary;")
+    pg_hook.run("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_date_summary;")
+
+default_args = {
+    "retries": 0,
+    "start_date": datetime(2023, 1, 1),
+}
 dag = DAG("s3_to_postgres_pipeline", default_args=default_args, schedule="@monthly", catchup=True)
 
-extract = PythonOperator(task_id="download_from_s3", python_callable=download_from_s3, dag=dag)
-load = PythonOperator(task_id="load_to_postgres", python_callable=load_to_postgres, dag=dag)
+extract = PythonOperator(
+    task_id="download_from_s3", 
+    python_callable=download_from_s3, 
+    dag=dag
+)
+load = PythonOperator(
+    task_id="load_to_postgres", 
+    python_callable=load_to_postgres, 
+    dag=dag
+)
+create_views = PythonOperator(
+    task_id="create_materialized_views",
+    python_callable=create_materialized_views,
+    dag=dag
+)
+refresh_views = PythonOperator(
+    task_id="refresh_materialized_views",
+    python_callable=refresh_materialized_views,
+    dag=dag
+)
 
-extract >> load
+extract >> load >> create_views >> refresh_views

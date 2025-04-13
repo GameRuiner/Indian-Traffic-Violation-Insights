@@ -63,7 +63,11 @@ def upload_to_s3(**context):
         logging.error(traceback.format_exc())
         raise
 
-default_args = {"max_active_runs": 1, "retries": 0,}
+default_args = {
+    "max_active_runs": 1, 
+    "retries": 0,
+    "start_date": datetime(2023, 1, 1),
+}
 dag = DAG("traffic_violation_pipeline", default_args=default_args, schedule_interval='@monthly', catchup=True)
 
 task_extract = PythonOperator(task_id="extract_data", python_callable=extract_data, dag=dag)
