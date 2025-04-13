@@ -135,14 +135,21 @@ docker exec -it airflow-webserver airflow dags trigger s3_to_postgres_pipeline
 docker exec -it db psql -U postgres -d db -c "SELECT COUNT(*) FROM traffic_violations;"
 ```
 
-## Dashboard
+## Transformations
 
-To visualize and analyze data effectively, I researched various Business Intelligence (BI) tools and their compatibility with PostgreSQL. Below are my findings:
+Data prepared for dashboard in the data warehouse. Data transformed with simple SQL transformation (no dbt or similar tools were used). Two materialized view were created, tied to DB with refresh logic.
 
-1. Power BI – works only on Windows, limiting cross-platform accessibility.
-2. Tableau – the free public version does not support PostgreSQL as a data source.
-3. Looker – unable to connect to PostgreSQL, despite my Airflow DAG successfully doing so.
-4. Amazon QuickSight – the best option for my use case. It is cloud-based, supports multiple data sources (including PostgreSQL) even in the free version. However, a limitation is that dashboards cannot be made public, so insights are exported as a PDF file named insights.pdf.
+## 📊 Dashboard
+
+To effectively visualize and analyze the processed data, I evaluated several Business Intelligence (BI) tools for their compatibility with PostgreSQL and ease of use. Here’s a summary of the findings:
+
+1. Power BI – is limited to Windows environments, reducing cross-platform flexibility.
+2. Tableau – the free public version does not support PostgreSQL as a data source, which makes it unsuitable for this use case.
+3. Looker Studio (formerly Google Data Studio) – despite Airflow being able to connect to PostgreSQL successfully, Looker repeatedly failed to connect. Eventually, it began showing persistent “Server failed” errors.
+4. Metabase - subscription price starts at $85/month, which is too costly for a single public dashboard.
+5. Amazon QuickSight – the most practical option in this case. It’s cloud-based, supports many data sources (including PostgreSQL) in its free tier, and integrates easily with AWS services. However, dashboards cannot be made public, so insights are exported as a PDF report (insights.pdf) instead.
+
+If you’re willing to pay for a subscription to make a dashboard public, that’s your choice — but in my opinion, exporting the dashboard to a PDF file is more than enough to demonstrate the concept effectively.
 
 ## 🔧 Tech stack summary
 
