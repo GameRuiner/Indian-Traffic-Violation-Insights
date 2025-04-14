@@ -157,6 +157,9 @@ If youâ€™re willing to pay for a subscription to make a dashboard public, thatâ€
 
 - **Data lake**: AWS S3
 
+
+Project created for DE Zoomcamp.
+
 - **Data warehouse**: PostgreSQL
 
 - **ETL pipeline**: Apache Airflow 
