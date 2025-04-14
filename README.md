@@ -154,14 +154,13 @@ If you’re willing to pay for a subscription to make a dashboard public, that�
 ## 🔧 Tech stack summary
 
 - **IaC tool**: Terraform
-
+ 
 - **Data lake**: AWS S3
-
-
-Project created for DE Zoomcamp.
 
 - **Data warehouse**: PostgreSQL
 
 - **ETL pipeline**: Apache Airflow 
 
 - **Dashboard**: QuickSight
+
+Project created for DE Zoomcamp.
